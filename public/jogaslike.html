@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="sl">
+<head>
+<meta charset="UTF-8">
+<title>Joga Slike</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/annyang/2.6.1/annyang.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script><!-- Dodajanje TensorFlow.js in PoseNet v HTML:-->
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/posenet"></script>
+<link rel="stylesheet" href="stil2.css">
+<style>
+    body { font-family: Arial, sans-serif; display: flex; flex-direction: column; align-items: center; }
+    #video, #canvas, #poseImage { border: 1px solid black; }
+    .container { display: flex; justify-content: center; align-items: center; margin-top: 20px; }
+</style>
+</head>
+<body>
+    <header>
+        <nav>
+            <ul>
+                <li><a href="home.html">Domov</a></li>
+                <li><a href="index.html">Dodaj uporabnika</a></li>
+                <li><a href="jogaslike.html">Vaje preko kamere</a></li>
+                <li><a href="videi.html">Prikaz videov</a></li>
+                <li><a href="news.html">Novice</a></li>
+                <li><a href="events.html">Dogodki</a></li>
+                <li><a href="http://localhost:3000/logout">Odjava</a></li>
+            </ul>
+           
+        </nav>
+        <img src="slike/info.png" class="clickable" onclick="showInstructions();" alt="info">
+    </header>
+    <br>
+    <div class="container">   
+        <video id="video" width="640" height="480" autoplay></video>
+        <canvas id="canvas" width="350" height="200" style="display:none;"></canvas>
+        <img id="poseImage" src="slike/jogapoze/poza1.jpg" width="640" height="480" alt="poza1">
+    </div>
+    <button id="snap" onclick="takePicture();" style="display:block;">Slikaj</button>
+    <button onclick="startVoiceCommands();">Začni z glasovnimi ukazi</button>
+    
+
+    <script>
+        function setupCamera() {
+            const video = document.getElementById('video');
+            if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                navigator.mediaDevices.getUserMedia({ video: true })
+                    .then(function(stream) {
+                        video.srcObject = stream;
+                        video.play();
+                    })
+                    .catch(function(error) {
+                        console.error("Napaka pri dostopu do kamere:", error);
+                        alert('Napaka pri dostopu do kamere: ' + error.message);
+                    });
+            } else {
+                alert('Vaš brskalnik ne podpira dostopa do kamere!');
+            }
+        }
+
+        function takePicture() {
+            const canvas = document.getElementById('canvas');
+            const context = canvas.getContext('2d');
+            const video = document.getElementById('video');
+            context.drawImage(video, 0, 0, 640, 480);
+            canvas.style.display = 'block'; // Prikaži sliko
+            checkPose();  // Kliči funkcijo za preverjanje poze takoj po tem, ko je slika posneta
+        }
+
+        window.addEventListener('load', setupCamera);
+        window.addEventListener('load', nextPose); // Dodano za prikaz naslednje slike ob nalaganju strani
+
+        function speak(text) {
+            const speech = new SpeechSynthesisUtterance(text);
+            speech.lang = 'en-US';
+            window.speechSynthesis.speak(speech);
+        }
+
+        if (annyang) {
+            var commands = {
+                'photo': function() {
+                    document.getElementById('snap').click();
+                    speak('taking photo.');
+                },
+                'take photo': function() {
+                    document.getElementById('snap').click();
+                    speak('taking photo.');
+                },
+                'take image': function() {
+                    document.getElementById('snap').click();
+                    speak('taking photo.');
+                },
+                'image': function() {
+                    document.getElementById('snap').click();
+                    speak('taking photo.');
+                },
+                'check': function() {
+                    speak('Checking pose.');
+                    takePicture();  // Neposredno kličemo funkcijo za slikanje
+                },
+                'check pose': function() {
+                    speak('Checking pose.');
+                    takePicture();  // Neposredno kličemo funkcijo za slikanje
+                },
+                'show users': function() {
+                    document.getElementById('viewUsersButton').click();
+                    speak('Showing users.');
+                },
+                'users': function() {
+                    document.getElementById('viewUsersButton').click();
+                    speak('Showing users.');
+                },
+                'info': function() {
+                    speak('THis website shows you the images of yoga poses you can practice.');
+                },
+                'video': function() {
+                    window.location.href = '/videi.html';
+                    speak('Showing video.');
+                },
+                'show video': function() {
+                    window.location.href = '/videi.html';
+                    speak('Showing video.');
+                },
+                'home': function() {
+                    window.location.href = 'http://localhost:3000/test';
+                    speak('Logging off.');
+                },
+                'log out': function() {
+                    window.location.href = 'http://localhost:3000/test';
+                    speak('Logging off.');
+                },
+                'logout': function() {
+                    window.location.href = 'http://localhost:3000/test';
+                    speak('Logging off.');
+                }
+            };
+            annyang.addCommands(commands);
+            annyang.setLanguage('en');
+        }
+
+        function startVoiceCommands() {
+            if (annyang) {
+                annyang.start();
+                speak('Voice commands are active.');
+            } else {
+                alert('Voice commands are not supported by the browser.');
+            }
+        }
+
+        function showInstructions() {
+            const instructions = "Za začetek slikanja poze aktivirajte glasvone ukaze s klikom na gumb Začni z glasovnimi ukazi. Nato izgovorite 'foto' ali kliknite na gumb 'Slikaj'. Začetni tečaj zajema 5 poz, ko izvedete vsako pozo pravilno ste zaključili začetni tečaj! Uspešno vadbo vam želimo!";
+            alert(instructions);
+            speak(instructions);
+        }
+
+        // za preverjanje poze uporabnika na podlagi slikane slike
+        const threshold = 30200;  // Nastavitev praga
+
+        let currentPoseIndex = -1;
+        let correctPosesCount = 0;
+        const poses = ["slike/jogapoze/poza1.jpg", "slike/jogapoze/poza2.jpg", "slike/jogapoze/poza3.jpg", "slike/jogapoze/poza4.jpg", "slike/jogapoze/poza5.jpg"];
+
+        function nextPose() {
+            if (currentPoseIndex < poses.length - 1) {
+                currentPoseIndex++;
+                document.getElementById('poseImage').src = poses[currentPoseIndex];
+                document.getElementById('canvas').style.display = 'none'; // Skrij sliko
+                speak('Nadaljujte z naslednjo pozo. Izgovorite foto, da slikate.');
+            } else {
+                speak('Čestitamo, uspešno ste opravili začetni tečaj izvedbe joge. To je bila zadnja poza.');
+               // alert('Čestitamo, uspešno ste opravili začetni tečaj izvedbe joge. To je bila zadnja poza.');
+            }
+        }
+
+        async function checkPose() {
+            const net = await posenet.load();
+            const webcamImage = document.getElementById('canvas');
+            console.log('Model naložen.');
+            const poseImage = document.getElementById('poseImage');
+            const webcamPose = await net.estimateSinglePose(webcamImage, { flipHorizontal: false });
+            const examplePose = await net.estimateSinglePose(poseImage, { flipHorizontal: false });
+
+            const distance = calculateDistance(webcamPose.keypoints, examplePose.keypoints);
+            if (distance < threshold) {
+               // console.log('Poza pravilna.');
+               // alert('Poza je pravilna!');
+                speak('Pose is correct!');
+                correctPosesCount++;
+                if (correctPosesCount >= 5) {
+                    speak('Čestitamo, uspešno ste opravili začetni tečaj izvedbe joge. To je bila zadnja poza.');
+                    alert('Čestitamo, uspešno ste opravili začetni tečaj izvedbe joge. To je bila zadnja poza.');
+                } else {
+                    nextPose();  // Prehod na naslednjo pozo
+                }
+            } else {
+                console.log('Poza ni pravilna.');
+                //alert('Poza ni pravilna, poskusite znova.');
+                speak('Poza ni pravilna, poskusite znova.');
+            }
+        }
+
+        function calculateDistance(kp1, kp2) {
+            let sumDistance = 0;
+            kp1.forEach((keypoint, index) => {
+                const xDiff = keypoint.position.x - kp2[index].position.x;
+                const yDiff = keypoint.position.y - kp2[index].position.y;
+                sumDistance += Math.sqrt(xDiff * xDiff + yDiff * yDiff);
+            });
+            return sumDistance;
+        }
+    
+</script>
+</body>
+</html>

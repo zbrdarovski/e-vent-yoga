@@ -1,0 +1,20 @@
+[
+    {
+        "title": "New Yoga Classes Announced",
+        "date": "2024-05-25",
+        "content": "We are excited to announce new yoga classes starting this June. Join us for a rejuvenating experience!",
+        "image": "/slike/homeslike/image1.jpg"
+    },
+    {
+        "title": "YogaFlex App Update",
+        "date": "2024-05-20",
+        "content": "The YogaFlex app has been updated with new features and improved performance. Make sure to update your app!",
+        "image": "/slike/homeslike/image3.jpg"
+    },
+    {
+        "title": "International Yoga Day Event",
+        "date": "2024-06-21",
+        "content": "Celebrate International Yoga Day with us! Join our special event with live sessions and workshops.",
+        "image": "/slike/homeslike/image5.jpg"
+    }
+]

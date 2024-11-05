@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="sl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upravljanje dogodkov - YogaFlex</title>
+    <link rel="stylesheet" href="stil5.css">
+</head>
+<body>
+    <header>
+        <nav>
+            <ul>
+                <li><a href="home.html">Domov</a></li>
+                <li><a href="index.html">Dodaj uporabnika</a></li>
+                <li><a href="jogaslike.html">Vaje preko kamere</a></li>
+                <li><a href="videi.html">Prikaz videov</a></li>
+                <li><a href="news.html">Novice</a></li>
+                <li><a href="events.html">Dogodki</a></li>
+                <li><a href="http://localhost:3000/logout">Odjava</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <section id="manage-news-section">
+        <h1>Upravljanje dogodkov</h1>
+
+        <form id="news-form">
+            <input type="hidden" id="news-id">
+            <div>
+                <label for="news-title">Ime</label>
+                <input type="text" id="news-title" required>
+            </div>
+            <div>
+                <label for="news-content">Opis</label>
+                <textarea id="news-content" required></textarea>
+            </div>
+            <div>
+                <label for="news-location">Lokacija</label>
+                <input type="text" id="news-location" required>
+            </div>
+            <div>
+                <label for="news-date">Datum</label>
+                <input type="date" id="news-date" required>
+            </div>
+            <div>
+                <label for="news-image">Slika (URL)</label>
+                <input type="text" id="news-image">
+            </div>            
+            <button type="submit">Dodaj dogodek</button>
+        </form>
+
+        <table id="news-table">
+            <thead>
+                <tr>
+                    <th>Ime</th>
+                    <th>Opis</th>
+                    <th>Lokacija</th>
+                    <th>Datum</th>
+                    <th>Slika</th>
+                    <th>Akcije</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- News items will be dynamically added here -->
+            </tbody>
+        </table>
+        <p><button onclick="location.href='events.html'" class="button">Nazaj</button></p>
+
+    </section>
+
+    <div id="delete-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Izbriši dogodek</h2>
+            </div>
+            <div class="modal-body">
+                <p>Ali ste prepričani, da želite izbrisati ta dogodek?</p>
+            </div>
+            <div class="modal-footer">
+                <button class="button" onclick="closeModal()">Prekliči</button>
+                <button class="delete-button" id="confirm-delete-button">Izbriši</button>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2024 YogaFlex. Vse pravice pridržane.</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const newsForm = document.getElementById('news-form');
+            const newsTableBody = document.getElementById('news-table').getElementsByTagName('tbody')[0];
+            const deleteModal = document.getElementById('delete-modal');
+            let deleteEventId = null;
+
+            function renderNews() {
+                fetch('http://localhost:3000/events/allevents')
+                    .then(response => response.json())
+                    .then(data => {
+                        newsTableBody.innerHTML = '';
+                        data.forEach((news, index) => {
+                            const row = newsTableBody.insertRow();
+                            row.innerHTML = `
+                                <td>${news.name}</td>
+                                <td>${news.description}</td>
+                                <td>${news.location}</td>
+                                <td>${formatDate(news.date)}</td>
+                                <td><img src="${news.pictureUrl}" alt="${news.name}" style="width: 50px; height: 50px;"></td>
+                                <td>
+                                    <button class="button" onclick="editNews('${news._id}')">Uredi</button>
+                                    <button class="button" onclick="openDeleteModal('${news._id}')">Izbriši</button>
+                                </td>   
+                            `;
+                        });
+                    })
+                    .catch(error => console.error('Error fetching events:', error));
+            }
+
+            function formatDate(dateString) {
+                const date = new Date(dateString);
+                const day = String(date.getDate()).padStart(2, '0');
+                const month = String(date.getMonth() + 1).padStart(2, '0');
+                const year = String(date.getFullYear()).slice(-2);
+                return `${day}/${month}/${year}`;
+            }
+
+            function saveNews() {
+                const newsId = document.getElementById('news-id').value;
+                const newsTitle = document.getElementById('news-title').value;
+                const newsContent = document.getElementById('news-content').value;
+                const newsLocation = document.getElementById('news-location').value;
+                const newsDate = document.getElementById('news-date').value;
+                const newsImage = document.getElementById('news-image').value;
+
+                let newsData = {
+                    name: newsTitle,
+                    description: newsContent,
+                    location: newsLocation,
+                    date: newsDate,
+                    pictureUrl: newsImage
+                };
+
+                let url = 'http://localhost:3000/events';
+                let method = 'POST';
+                
+                if (newsId) {
+                    // If newsId is present, we are updating an existing event
+                    console.log('news id gggg: ', newsId);
+                    url = `http://localhost:3000/events/${newsId}`;
+                    method = 'PUT';
+                    newsData._id = newsId;  // Ensure the id is included for updating
+                }
+                console.log('news id: ', newsId);
+
+                console.log('URL:', url);
+                console.log('Method:', method);
+                console.log('News Data:', newsData);
+
+                fetch(url, {
+                    method: method,
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(newsData)
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        console.error('Error:', response);
+                        throw new Error('Error saving event');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    renderNews();
+                    newsForm.reset();
+                    document.getElementById('news-id').value = '';
+                })
+                .catch(error => console.error('Error saving event:', error));
+            }
+
+            window.editNews = function(id) {
+                fetch(`http://localhost:3000/events/${id}`)
+                    .then(response => response.json())
+                    .then(event => {
+                        document.getElementById('news-id').value = event._id;
+                        document.getElementById('news-title').value = event.name;
+                        document.getElementById('news-content').value = event.description;
+                        document.getElementById('news-location').value = event.location;
+                        document.getElementById('news-date').value = event.date.split('T')[0];
+                        document.getElementById('news-image').value = event.pictureUrl;
+                    })
+                    .catch(error => console.error('Error fetching event for editing:', error));
+            }
+
+            window.openDeleteModal = function(id) {
+                deleteEventId = id;
+                deleteModal.style.display = 'block';
+            }
+
+            window.closeModal = function() {
+                deleteModal.style.display = 'none';
+                deleteEventId = null;
+            }
+
+            document.getElementById('confirm-delete-button').addEventListener('click', () => {
+                if (deleteEventId) {
+                    deleteNews(deleteEventId);
+                }
+            });
+
+            function deleteNews(id) {
+                fetch(`http://localhost:3000/events/${id}`, {
+                    method: 'DELETE'
+                })
+                .then(() => {
+                    renderNews();
+                    closeModal();
+                    newsForm.reset();
+                    document.getElementById('news-id').value = '';
+                })
+                .catch(error => console.error('Error deleting event:', error));
+            }
+
+            newsForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                saveNews();
+            });
+
+            renderNews();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="sl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YogaFlex</title>
+    <link rel="stylesheet" href="stil2.css">
+</head>
+<body>
+    <header>
+        <nav>
+            <ul>
+                <li><a href="home.html">Domov</a></li>
+                <li><a href="index.html">Dodaj uporabnika</a></li>
+                <li><a href="jogaslike.html ">Vaje preko kamere</a></li>
+                <li><a href="videi.html">Prikaz videov</a></li>
+                <li><a href="news.html">Novice</a></li>
+                <li><a href="events.html">Dogodki</a></li>
+                <li><a href="http://localhost:3000/logout">Odjava</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <section class="hero">
+        <div class="hero-content">
+            <h1>Dobrodošli na spletni strani za Yogo</h1>
+            <p>Najboljše mesto za vašo jogo</p>
+        </div>
+        <div class="hero-image">
+            <img id="heroImage" src="slike/homeslike/image1.jpg" alt="Joga slika">
+        </div>
+    </section>
+
+    <footer>
+        <p>&copy; 2024 YogaFlex. Vse pravice pridržane.</p>
+    </footer>
+
+    <script>
+        const images = ["slike/homeslike/image1.jpg", "slike/homeslike/image2.jpg", "slike/homeslike/image3.jpg", "slike/homeslike/image4.jpg", "slike/homeslike/image5.jpg"];
+        const heroImage = document.getElementById('heroImage');
+
+        function changeImage() {
+            const randomIndex = Math.floor(Math.random() * images.length);
+            const newImage = new Image();
+            newImage.src = images[randomIndex];
+            newImage.classList.add('fade');
+            document.querySelector('.hero-image').appendChild(newImage);
+
+            setTimeout(() => {
+                newImage.classList.remove('fade');
+                heroImage.classList.add('fade');
+                setTimeout(() => {
+                    heroImage.src = images[randomIndex];
+                    heroImage.classList.remove('fade');
+                    document.querySelector('.hero-image').removeChild(newImage);
+                }, 1000);
+            }, 100);
+        }
+
+        setInterval(changeImage, 5000); // Menjaj sliko vsakih 5 sekund
+    </script>
+</body>
+</html>

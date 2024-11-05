@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="stil.css">
+    <script src="https://cdn.jsdelivr.net/npm/dexie@3.2.0/dist/dexie.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/annyang/2.6.1/annyang.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
+    <link rel="manifest" href="manifest.json">
+    <!--<script src="/js/subscribeToPush.js"></script> v glavo (<headza potisna sporočila -->
+    <script src="/js/shrani.js" 'defer'></script>
+    <!-- za lazy-loadin -->
+    <script src="/js/lazyloading.js" defer></script>
+    <script src="/js/client.js" defer></script>
+    <title>JOGA APLIKAICJA - Dodaj uporabnika</title>
+
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js').then(() => {
+                    console.log('Service Worker registered successfully.');
+                }).catch((error) => {
+                    console.log('Service Worker registration failed:', error);
+                });
+            });
+        }
+
+        // Funkcija za pošiljanje potisnega sporočila
+        async function sendPushNotification() {
+            try {
+                //zahteva na končno točko za pošiljanje potisnih sporočil
+                const response = await fetch('/sendPushNotification', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ message: 'Pozdravljeni na spletni strani JOGA' })
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to send push notification');
+                }
+
+                // Prikažite uspešno sporočilo
+                alert('Potisno sporočilo uspešno poslano.');
+            } catch (error) {
+                console.error('Napaka pri pošiljanju potisnega sporočila:', error);
+                alert('Napaka pri pošiljanju potisnega sporočila.');
+            }
+        }
+
+    </script>
+</head>
+
+<body>
+    <header>
+        <nav>
+            <ul>
+                <li><a href="home.html">Domov</a></li>
+                <li><a href="index.html">Dodaj uporabnika</a></li>
+                <li><a href="jogaslike.html ">Vaje preko kamere</a></li>
+                <li><a href="videi.html">Prikaz videov</a></li>
+                <li><a href="news.html">Novice</a></li>
+                <li><a href="events.html">Dogodki</a></li>
+                <li><a href="http://localhost:3000/logout">Odjava</a></li>
+            </ul>
+            <button id="voiceCommandButton" onclick="startVoiceCommands()" title="Začni glasovno komunikacijo">
+                <i class="fas fa-microphone"></i> Govor - ob kliku na gumb imate možnost glasovne komunikacije s
+                spletnim
+                vmesnikom
+            </button>
+        </nav>
+    </header>
+    <div class="header-images">
+        <img data-src="/slike/joga1.jpg" alt="Joga 1" class="lazy-image">
+        <img src="/slike/joga2.jpg" alt="Joga 2" class="#">
+    </div>
+    <h1><a href="http://localhost:3000/test">JOGA APLIKACIJA</a></h1>
+    <hr>
+    <h1>Dodaj uporabnika</h1>
+    <form id="userForm">
+        <label for="ime">Ime:</label><br>
+        <input type="text" id="ime" name="ime" required><br>
+        <label for="priimek">Priimek:</label><br>
+        <input type="text" id="priimek" name="priimek" required><br>
+        <label for="leta">Starost:</label><br>
+        <input type="number" id="leta" name="leta" required><br><br>
+        <label for="eposta">E-pošta:</label><br>
+        <input type="text" id="eposta" name="eposta" required><br>
+
+        <button type="submit">Dodaj uporabnika</button>
+    </form>
+
+    <h1>Preglej uporabnike</h1>
+    <button id="viewUsersButton">Preglej uporabnike</button>
+    <div id="userList"></div>
+    <div id="editUserForm" style="display:none;">
+        <h2>Uredi uporabnika</h2>
+        <input type="hidden" id="editUserId">
+        <input type="text" id="editIme" placeholder="Ime"><br>
+        <input type="text" id="editPriimek" placeholder="Priimek"><br>
+        <input type="number" id="editLeta" placeholder="Starost"><br>
+        <input type="text" id="editEposta" placeholder="E-pošta"><br>
+        <button onclick="submitEditUser()">Potrdi urejanje</button>
+    </div>
+    <script>
+        async function getUsers() {
+            try {
+                if (!navigator.onLine) {
+                    throw new Error('No network connection');
+                }
+                const response = await fetch('/getUser');
+                if (!response.ok || !response.headers.get('content-type')?.includes('application/json')) {
+                    throw new Error('Network response was not ok or not JSON');
+                }
+                const users = await response.json();
+                await saveDataLocally(users);
+                displayUsers(users);
+            } catch (error) {
+                console.error('Napaka pri pridobivanju uporabnikov:', error);
+                const localData = await getDataLocally();
+                if (localData && localData.length > 0) {
+                    displayUsers(localData);
+                } else {
+                    document.getElementById('userList').innerHTML = '<p>Ni podatkov za prikaz v "offline" načinu.</p>';
+                }
+            }
+        }
+
+        function displayUsers(users) {
+            const userListDiv = document.getElementById('userList');
+            userListDiv.innerHTML = ''; // Počisti seznam pred dodajanjem novega
+            if (users.length === 0) {
+                userListDiv.innerHTML = '<p>Ni uporabnikov za prikaz</p>';
+            } else {
+                const userList = document.createElement('ul');
+                users.forEach(user => {
+                    const listItem = document.createElement('li');
+                    listItem.innerHTML = `
+                <strong>Ime:</strong> ${user.ime}, 
+                <strong>Priimek:</strong> ${user.priimek}, 
+                <strong>Starost:</strong> ${user.leta}, 
+                <strong>E-pošta:</strong> ${user.eposta}
+                <button onclick="editUser('${user._id}')">Uredi</button>
+                <button onclick="deleteUser('${user._id}')">Izbriši</button>
+            `;
+                    userList.appendChild(listItem);
+                });
+                userListDiv.appendChild(userList);
+            }
+        }
+
+
+
+        // Funkcija za brisanje uporabnika
+        async function deleteUser(userId) {
+            try {
+                const response = await fetch(`/deleteUser/${userId}`, {
+                    method: 'DELETE',
+                    headers: {
+
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error('Napaka pri brisanju uporabnika');
+                }
+                alert("Uporabnik uspešno izbrisan"); // Dodano obvestilo za uporabnika
+                // Osveži seznam uporabnikov
+                getUsers();
+            } catch (error) {
+                console.error('Napaka:', error);
+                alert("Napaka pri brisanju uporabnika"); // Dodano obvestilo o napaki
+            }
+        }
+        document.getElementById('viewUsersButton').addEventListener('click', getUsers);
+    </script>
+
+
+    <script>
+        // Funkcija za pripravo in prikaz obrazca za urejanje
+        async function editUser(userId) {
+            try {
+                const response = await fetch(`/getUser/${userId}`);
+                if (!response.ok) {
+                    throw new Error('Napaka pri pridobivanju podatkov uporabnika');
+                }
+                const user = await response.json();
+
+                // Napolni obrazec z uporabnikovimi podatki
+                document.getElementById('editUserId').value = user._id;
+                document.getElementById('editIme').value = user.ime;
+                document.getElementById('editPriimek').value = user.priimek;
+                document.getElementById('editLeta').value = user.leta;
+                document.getElementById('editEposta').value = user.eposta;
+
+                // Prikaz obrazca
+                document.getElementById('editUserForm').style.display = 'block';
+            } catch (error) {
+                console.error('Napaka:', error);
+            }
+        }
+
+        // Funkcija za oddajo urejenih podatkov
+        async function submitEditUser() {
+            const userId = document.getElementById('editUserId').value;
+            const ime = document.getElementById('editIme').value;
+            const priimek = document.getElementById('editPriimek').value;
+            const leta = document.getElementById('editLeta').value;
+            const eposta = document.getElementById('editEposta').value;
+
+            try {
+                const response = await fetch(`/urediUser/${userId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ ime, priimek, leta, eposta })
+                });
+
+                if (!response.ok) {
+                    throw new Error('Napaka pri urejanju uporabnika');
+                }
+                alert("Uporabnik uspešno urejen");
+                getUsers(); // Osveži seznam uporabnikov
+                document.getElementById('editUserForm').style.display = 'none'; // Skrij obrazec
+            } catch (error) {
+                console.error('Napaka:', error);
+                alert("Napaka pri urejanju uporabnika");
+            }
+        }
+
+
+    </script>
+
+    <script>
+        // Funkcija za iskanje uporabnikov glede na ime ali priimek
+        async function findUserByImePriimek() {
+            const imepriimek = document.getElementById('userIdOrName').value;
+            try {
+                const response = await fetch(`/getUserImePriimek/${imepriimek}`);
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                const users = await response.json();
+
+                // Prikaži uporabnike ali sporočilo, če ni najden noben
+                const userListDiv = document.getElementById('userList');
+                userListDiv.innerHTML = '';
+                if (users.length === 0) {
+                    userListDiv.innerHTML = '<p>Uporabnikov ni mogoče najti.</p>';
+                } else {
+                    const userList = document.createElement('ul');
+                    users.forEach(user => {
+                        const listItem = document.createElement('li');
+                        listItem.textContent = `Ime: ${user.ime}, Priimek: ${user.priimek}, Starost: ${user.leta}, E-pošta: ${user.eposta}`;
+                        userList.appendChild(listItem);
+                    });
+                    userListDiv.appendChild(userList);
+                }
+            } catch (error) {
+                console.error('Napaka:', error);
+            }
+        }
+    </script>
+
+    <!-- Dodajanje polja za vnos ID-ja ali imena in gumb za brisanje -->
+    <h1>Iskanje uporabnika</h1>
+    <label for="userIdOrName">Vnesi priimek ali ime uporabnika za iskanje:</label><br>
+    <input type="text" id="userIdOrName" name="userIdOrName"><br>
+    <button onclick="findUserByImePriimek()">Poišči uporabnika</button>
+
+
+    <br><br>
+    <hr>
+
+    <script>
+        //bližnjice na tipkovnici
+        document.addEventListener('keydown', function (event) {
+            //Ctrl+* za skrivanje prikaza uporabnikov
+            if (event.ctrlKey && event.key === '*') {
+                const userListDiv = document.getElementById('userList');
+                //če je seznam že skrit, in ga po potrebi pokažemo ali skrijemo
+                if (userListDiv.style.display === 'none') {
+                    userListDiv.style.display = 'block'; // Pokaži, če je že skrit
+                } else {
+                    userListDiv.style.display = 'none'; // Sicer skrij
+                }
+            } else if (event.ctrlKey && event.key === '/') {
+                document.getElementById('viewUsersButton').click();
+            }
+        });
+    </script>
+
+    <br>
+    <hr>
+    <!-- Gumb za pošiljanje potisnega sporočila -->
+    <h1>Pošlji potisno sporočilo</h1>
+    <button onclick="sendPushNotification()">Pošlji potisno sporočilo</button>
+
+    <hr><br>
+    <!-- za kamero prikaz -->
+    <video id="video" width="640" height="480" autoplay></video>
+    <canvas id="canvas" width="640" height="480" style="display:none;"></canvas>
+    <button id="snap" onclick="takePicture();" style="display:none;">Slikaj</button>
+    <script>
+        function setupCamera() {
+            const video = document.getElementById('video');
+
+            //dostop do kamere
+            if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                navigator.mediaDevices.getUserMedia({ video: true })
+                    .then(function (stream) {
+                        video.srcObject = stream;
+                        video.play();
+                    })
+                    .catch(function (error) {
+                        console.error("Napaka pri dostopu do kamere:", error);
+                    });
+            } else {
+                alert('Vaš brskalnik ne podpira dostopa do kamere!');
+            }
+        }
+
+        function takePicture() {
+            const canvas = document.getElementById('canvas');
+            const context = canvas.getContext('2d');
+            const video = document.getElementById('video');
+            context.drawImage(video, 0, 0, 640, 480);
+            canvas.style.display = 'block'; // Prikaži sliko
+        }
+
+        // naložimo camero
+        window.addEventListener('load', setupCamera);
+    </script>
+    <!-- za glasovne ukaze -->
+    <script>
+        function speak(text) {
+            const speech = new SpeechSynthesisUtterance(text);
+            speech.lang = 'en-US'; // uporaba angleščine
+            window.speechSynthesis.speak(speech);
+        }
+        if (annyang) {
+            annyang.start();
+            var commands = {
+                'photo': function () {
+                    document.getElementById('snap').click(); //aktiviramo gumb za slikanje
+                    speak('taking a photo.');
+                },
+                'image': function () {
+                    document.getElementById('snap').click(); //aktiviramo gumb za slikanje
+                    speak('taking your image.');
+                },
+                'users': function () {
+                    document.getElementById('viewUsersButton').click();
+                    speak('Showing users.');
+                },
+                'show users': function () {
+                    document.getElementById('viewUsersButton').click();
+                    speak('Showing users.');
+                },
+                'info': function () {
+                    speak('THis website shows you the basic info about yoga.');
+                },
+                'video': function () {
+                    window.location.href = '/videi.html'; //povezava na videi.html vsebine
+                    speak('Showing video.');
+                },
+                'show video': function () {
+                    window.location.href = '/videi.html'; //povezava na videi.html vsebine
+                    speak('Showing video.');
+                },
+                'odjava': function () {
+                    window.location.href = 'http://localhost:3000/logout';
+                    speak('Odjavljam.');
+                }
+            };
+            annyang.addCommands(commands);
+            annyang.setLanguage('en');  // Nastavitev jezika na slovenščino
+            annyang.start();
+        }
+    </script>
+    <!-- dodajanje gumba ki sproži komunikacijo med uporabnikom in spletno stranjo-->
+    <script>
+        function startVoiceCommands() {
+            if (annyang) {
+                annyang.start();
+                speak('Voice commands are active.');
+            } else {
+                alert('Voice commands can not be used in this browser.');
+            }
+        }
+    </script>
+    <footer>
+        <img data-src="/slike/icons/yoga-fotor-72x72.png" alt="Joga icon" class="lazy-image">
+        <p>&copy; 2024 YogaFlex. Vse pravice pridržane.</p>
+    </footer>
+</body>
+
+</html>

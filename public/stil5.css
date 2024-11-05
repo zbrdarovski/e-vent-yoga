@@ -1,0 +1,203 @@
+/* Dodajanje Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Roboto', sans-serif; /* Spremenjen tip pisave */
+    line-height: 1.6;
+    margin: 0; /* Remove default body margin */
+    padding-top: 60px; /* Height of the fixed header */
+    padding-bottom: 40px; /* Height of the fixed footer */
+}
+
+header {
+    background: #0660e6; /* Spremenjeno ozadje menija v sivomodro barvo */
+    color: #fff;
+    padding: 10px 0;
+    text-align: center;
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 1000;
+}
+
+header nav ul {
+    list-style: none;
+    display: flex;
+    justify-content: center;
+}
+
+header nav ul li {
+    margin: 0 20px;
+}
+
+header nav ul li a {
+    color: #fff;
+    text-decoration: none;
+    font-size: 18px;
+    transition: color 0.3s ease, background-color 0.3s ease; /* Dodan prehod za barvo */
+    padding: 5px 10px;
+    border-radius: 5px;
+}
+
+header nav ul li a:hover {
+    color: #556b8d; /* Sprememba barve besedila ob premiku miškinega kazalca */
+    background-color: #fff; /* Sprememba barve ozadja ob premiku miškinega kazalca */
+}
+
+#manage-news-section {
+    padding: 2rem 1rem;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+#manage-news-section h1 {
+    text-align: center;
+    margin-bottom: 2rem;
+    font-size: 2.5rem;
+    color: #333;
+}
+
+#news-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+#news-form div {
+    display: flex;
+    flex-direction: column;
+}
+
+#news-form label {
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+}
+
+#news-form input,
+#news-form textarea {
+    padding: 0.5rem;
+    font-size: 1rem;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+#news-form button {
+    background-color: #0660e6; /* Primarna barva gumba */
+    color: #fff; /* Barva besedila */
+    border: none; /* Odstranjena privzeta obroba */
+    padding: 10px 20px; /* Notranje odmik za večji gumb */
+    font-size: 16px; /* Velikost pisave */
+    border-radius: 5px; /* Zaobljeni robovi */
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+    margin: 10px;
+}
+
+#news-form button:hover {
+    background-color: #044aab; /* Sprememba barve ob premiku miškinega kazalca */
+    transform: scale(1.05);
+}
+
+#news-form button:active {
+    transform: scale(1);
+}
+
+#news-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 2rem;
+}
+
+#news-table th, #news-table td {
+    padding: 0.5rem;
+    text-align: left;
+    border: 1px solid #ddd;
+}
+
+#news-table th {
+    background-color: #f4f4f4;
+}
+
+#news-table img {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+}
+
+.button {
+    background-color: #0660e6; /* Primarna barva gumba */
+    color: #fff; /* Barva besedila */
+    border: none; /* Odstranjena privzeta obroba */
+    padding: 10px 20px; /* Notranje odmik za večji gumb */
+    font-size: 16px; /* Velikost pisave */
+    border-radius: 5px; /* Zaobljeni robovi */
+    cursor: pointer; /* Kazalec ob premiku miške nad gumbom */
+    transition: background-color 0.3s ease, transform 0.3s ease; /* Prehodi za gladke spremembe */
+    margin: 10px; /* Zunanji odmik za razmik med gumbi */
+}
+
+footer {
+    background: #333;
+    color: #fff;
+    text-align: center;
+    padding: 10px 0;
+    position: fixed;
+    width: 100%;
+    bottom: 0;
+    display: flex;
+    justify-content: center;
+    /* Centers items horizontally */
+    align-items: center;
+    /* Centers items vertically */
+    gap: 10px;
+    /* Adjust the gap between items */
+}
+
+/* Add these styles to your CSS file */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgb(0, 0, 0);
+    background-color: rgba(0, 0, 0, 0.4);
+    padding-top: 60px;
+}
+
+.modal-content {
+    background-color: #fefefe;
+    margin: 5% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+}
+
+.modal-header,
+.modal-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modal-footer button {
+    margin-left: 10px;
+}
+
+.delete-button {
+    background-color: red;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+}

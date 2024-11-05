@@ -1,0 +1,26 @@
+{
+    "short_name": "Joga Aplikacija",
+    "name": "Joga Aplikacija - Najboljše mesto za vašo jogo",
+    "start_url": "/home.html",
+    "display": "standalone",
+    "theme_color": "#000000",
+    "background_color": "#ffffff",
+    "icons": [
+      {
+        "src": "/slike/icons/yoga-fotor-172x172.png",
+        "type": "image/png",
+        "sizes": "172x172"
+      },
+      {
+        "src": "/slike/icons/yoga-fotor-192x192.png",
+        "type": "image/png",
+        "sizes": "192x192"
+      },
+      {
+        "src": "/slike/icons/yoga-fotor-72x72.png",
+        "type": "image/png",
+        "sizes": "72x72"
+      }
+    ]
+    
+  }

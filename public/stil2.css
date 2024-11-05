@@ -1,0 +1,128 @@
+/* Dodajanje Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Roboto', sans-serif; /* Spremenjen tip pisave */
+    line-height: 1.6;
+}
+
+header {
+    background: #0660e6; /* Spremenjeno ozadje menija v sivomodro barvo */
+    color: #fff;
+    padding: 10px 0;
+    text-align: center;
+}
+
+header nav ul {
+    list-style: none;
+    display: flex;
+    justify-content: center;
+}
+
+header nav ul li {
+    margin: 0 20px;
+}
+
+header nav ul li a {
+    color: #fff;
+    text-decoration: none;
+    font-size: 18px;
+    transition: color 0.3s ease, background-color 0.3s ease; /* Dodan prehod za barvo */
+    padding: 5px 10px;
+    border-radius: 5px;
+}
+
+header nav ul li a:hover {
+    color: #556b8d; /* Sprememba barve besedila ob premiku miškinega kazalca */
+    background-color: #fff; /* Sprememba barve ozadja ob premiku miškinega kazalca */
+}
+
+.hero {
+    position: relative;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f4f4f4;
+    text-align: center;
+}
+
+.hero-content {
+    z-index: 1;
+}
+
+.hero h1 {
+    font-size: 50px;
+    margin-bottom: 20px;
+}
+
+.hero p {
+    font-size: 24px;
+    margin-bottom: 20px;
+}
+
+.hero-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    z-index: 0;
+}
+
+.hero-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0.7;
+    transition: opacity 1s ease-in-out; /* Dodan prehod za lahek prehod */
+}
+
+footer {
+    background: #333;
+    color: #fff;
+    text-align: center;
+    padding: 10px 0;
+    position: fixed;
+    width: 100%;
+    bottom: 0;
+}
+
+button {
+    background-color: #0660e6; /* Primarna barva gumba */
+    color: #fff; /* Barva besedila */
+    border: none; /* Odstranjena privzeta obroba */
+    padding: 10px 20px; /* Notranje odmik za večji gumb */
+    font-size: 16px; /* Velikost pisave */
+    border-radius: 5px; /* Zaobljeni robovi */
+    cursor: pointer; /* Kazalec ob premiku miške nad gumbom */
+    transition: background-color 0.3s ease, transform 0.3s ease; /* Prehodi za gladke spremembe */
+    margin: 10px; /* Zunanji odmik za razmik med gumbi */
+}
+
+button:hover {
+    background-color: #044aab; /* Sprememba barve ob premiku miškinega kazalca */
+    transform: scale(1.05); /* Povečava gumba ob premiku miškinega kazalca */
+}
+
+button:active {
+    transform: scale(1); /* Ponastavitev velikosti gumba ob kliku */
+}
+
+img.clickable {
+    cursor: pointer; /* Kazalec ob premiku miške nad sliko */
+    transition: transform 0.3s ease; /* Prehod za spremembo velikosti */
+    width: 50px; /* Nastavljena širina slike */
+    height: 50px; /* Nastavljena višina slike */
+}
+
+img.clickable:hover {
+    transform: scale(1.05); /* Povečava slike ob premiku miškinega kazalca */
+}

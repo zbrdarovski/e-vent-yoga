@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="sl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YogaFlex</title>
+    <link rel="stylesheet" href="stil6.css">
+</head>
+<body>
+    <header>
+        <nav>
+            <ul>
+                <li><a href="home.html">Domov</a></li>
+                <li><a href="index.html">Dodaj uporabnika</a></li>
+                <li><a href="jogaslike.html">Vaje preko kamere</a></li>
+                <li><a href="videi.html">Prikaz videov</a></li>
+                <li><a href="news.html">Novice</a></li>
+                <li><a href="events.html">Dogodki</a></li>
+                <li><a href="http://localhost:3000/logout">Odjava</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <section id="events-section">
+        <h1>Dogodki</h1>
+        <div id="filter-container">
+            <label for="filter">Filter:</label>
+            <select id="filter">
+                <option value="all">Prikaži vse dogodke</option>
+                <option value="past">Prikaži pretekle dogodke</option>
+                <option value="upcoming">Prikaži prihajajoče dogodke</option>
+            </select>
+        </div>
+        <div id="events-container"></div>
+        <p><button onclick="location.href='eventsmanager.html'">Upravljanje dogodkov</button></p>
+    </section>
+
+    <footer>
+        <p>&copy; 2024 YogaFlex. Vse pravice pridržane.</p>
+    </footer>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const filterSelect = document.getElementById('filter');
+            filterSelect.addEventListener('change', () => renderEvents(filterSelect.value));
+
+            renderEvents('all');
+        });
+
+        function renderEvents(filter) {
+            fetch('http://localhost:3000/events/allevents')
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Events data:', data);
+                    const eventsContainer = document.getElementById('events-container');
+                    eventsContainer.innerHTML = '';
+                    const now = new Date();
+                    data.forEach(event => {
+                        const eventDate = new Date(event.date);
+                        if (filter === 'past' && eventDate >= now) return;
+                        if (filter === 'upcoming' && eventDate < now) return;
+                        
+                        const eventDiv = document.createElement('div');
+                        eventDiv.classList.add('events-article');
+                        
+                        const title = document.createElement('h2');
+                        title.textContent = event.name;
+                        
+                        const image = document.createElement('img');
+                        image.src = event.pictureUrl;
+                        image.alt = event.name;
+                        image.classList.add('events-image');
+                        
+                        const date = document.createElement('p');
+                        const formattedDate = formatDate(event.date);
+                        date.innerHTML = `<strong>Datum:</strong> ${formattedDate}`;
+                        
+                        const description = document.createElement('p');
+                        description.innerHTML = `<strong>Opis:</strong> ${event.description}`;
+
+                        const location = document.createElement('p');
+                        location.innerHTML = `<strong>Lokacija:</strong> ${event.location}`;
+                        
+                        eventDiv.appendChild(title);
+                        eventDiv.appendChild(image);
+                        eventDiv.appendChild(date);
+                        eventDiv.appendChild(description);
+                        eventDiv.appendChild(location);
+                        
+                        eventsContainer.appendChild(eventDiv);
+                    });
+                })
+                .catch(error => console.error('Error fetching events:', error));
+        }
+
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            const day = String(date.getDate()).padStart(2, '0');
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const year = String(date.getFullYear()).slice(-2);
+            return `${day}/${month}/${year}`;
+        }
+    </script>
+</body>
+</html>

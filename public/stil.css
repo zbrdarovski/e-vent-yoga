@@ -1,0 +1,232 @@
+/* Import Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Roboto', sans-serif;
+    /* Changed font family */
+    background-color: #f0f0f0;
+    color: #333;
+    text-align: center;
+    line-height: 1.6;
+    margin: 0;
+    /* Remove default body margin */
+    padding-top: 60px;
+    /* Height of the fixed header */
+    padding-bottom: 40px;
+    /* Height of the fixed footer */
+}
+
+h1,
+h2 {
+    color: #6a329f;
+}
+
+form,
+#editUserForm,
+#userList {
+    background-color: #fff;
+    border-radius: 8px;
+    display: inline-block;
+    margin: 10px auto;
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    text-align: left;
+    width: 300px;
+}
+
+input[type=text],
+input[type=number],
+button {
+    width: calc(100% - 22px);
+    padding: 10px;
+    margin: 5px 0;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    box-sizing: border-box;
+}
+
+button {
+    background-color: #0660e6;
+    /* Primary button color */
+    color: white;
+    border: none;
+    cursor: pointer;
+    padding: 10px 20px;
+    font-size: 16px;
+    border-radius: 5px;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+    margin: 10px;
+}
+
+button:hover {
+    background-color: #044aab;
+    transform: scale(1.05);
+}
+
+button:active {
+    transform: scale(1);
+}
+
+ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+li {
+    background-color: #e4d7f5;
+    margin: 10px 0;
+    padding: 10px;
+    border-radius: 5px;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    display: flex;
+}
+
+li strong {
+    margin-right: 5px;
+    font-weight: bold;
+}
+
+li button {
+    margin-left: 10px;
+}
+
+li span {
+    display: inline-block;
+    margin-right: 20px;
+}
+
+a {
+    color: #6a329f;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+/* Style for images */
+.header-images {
+    width: 100%;
+    position: relative;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.header-images img {
+    width: 100px;
+    height: auto;
+}
+
+.left-image {
+    position: absolute;
+    left: 0;
+    top: 0;
+}
+
+.right-image {
+    position: absolute;
+    right: 0;
+    top: 0;
+}
+
+#voiceCommandButton {
+    background-color: #0660e6;
+    color: white;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+#voiceCommandButton:hover {
+    background-color: #044aab;
+}
+
+section h1 {
+    margin-top: 100px;
+}
+
+.video-gallery {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+    padding: 20px;
+}
+
+.video-gallery iframe {
+    width: 100%;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+header {
+    background: #0660e6;
+    /* Spremenjeno ozadje menija v sivomodro barvo */
+    color: #fff;
+    padding: 10px 0;
+    text-align: center;
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 1000;
+}
+
+header nav ul {
+    list-style: none;
+    display: flex;
+    justify-content: center;
+    background: #0660e6;
+    /* Spremenjeno ozadje menija v sivomodro barvo */
+}
+
+header nav ul li {
+    margin: 0 20px;
+    background: #0660e6;
+    /* Spremenjeno ozadje menija v sivomodro barvo */
+}
+
+header nav ul li a {
+    color: #fff;
+    text-decoration: none;
+    font-size: 18px;
+    transition: color 0.3s ease, background-color 0.3s ease;
+    /* Dodan prehod za barvo */
+    padding: 5px 10px;
+    border-radius: 5px;
+    background: #0660e6;
+    /* Spremenjeno ozadje menija v sivomodro barvo */
+}
+
+header nav ul li a:hover {
+    color: #556b8d;
+    /* Sprememba barve besedila ob premiku miškinega kazalca */
+    background-color: #fff;
+    /* Sprememba barve ozadja ob premiku miškinega kazalca */
+}
+
+footer {
+    background: #333;
+    color: #fff;
+    text-align: center;
+    padding: 10px 0;
+    position: fixed;
+    width: 100%;
+    bottom: 0;
+    display: flex;
+    justify-content: center;
+    /* Centers items horizontally */
+    align-items: center;
+    /* Centers items vertically */
+    gap: 10px;
+    /* Adjust the gap between items */
+}

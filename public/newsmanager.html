@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="sl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upravljanje novic - YogaFlex</title>
+    <link rel="stylesheet" href="stil5.css">
+</head>
+
+<body>
+    <header>
+        <nav>
+            <ul>
+                <li><a href="home.html">Domov</a></li>
+                <li><a href="index.html">Dodaj uporabnika</a></li>
+                <li><a href="jogaslike.html">Vaje preko kamere</a></li>
+                <li><a href="videi.html">Prikaz videov</a></li>
+                <li><a href="news.html">Novice</a></li>
+                <li><a href="events.html">Dogodki</a></li>
+                <li><a href="http://localhost:3000/logout">Odjava</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <section id="manage-news-section">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <h1>Upravljanje novic</h1>
+            <a href="#" id="filter-link">Filter: Ascending</a>
+        </div>
+
+        <form id="news-form">
+            <input type="hidden" id="news-id">
+            <div>
+                <label for="news-title">Naslov:</label>
+                <input type="text" id="news-title" required>
+            </div>
+            <div>
+                <label for="news-content">Vsebina:</label>
+                <textarea id="news-content" required></textarea>
+            </div>
+            <div>
+                <label for="news-image">Slika (URL):</label>
+                <input type="text" id="news-image">
+            </div>
+            <button type="submit">Dodaj novico</button>
+        </form>
+
+        <table id="news-table">
+            <thead>
+                <tr>
+                    <th>Naslov</th>
+                    <th>Datum</th>
+                    <th>Vsebina</th>
+                    <th>Slika</th>
+                    <th>Akcije</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- News items will be dynamically added here -->
+            </tbody>
+        </table>
+        <p><a href="news.html">Nazaj</a></p>
+    </section>
+
+    <footer>
+        <p>&copy; 2024 YogaFlex. Vse pravice pridržane.</p>
+    </footer>
+
+    <div id="delete-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Izbriši novico</h2>
+            </div>
+            <div class="modal-body">
+                <p>Ali ste prepričani, da želite izbrisati to novico?</p>
+            </div>
+            <div class="modal-footer">
+                <button class="button" onclick="closeModal()">Prekliči</button>
+                <button class="delete-button" id="confirm-delete-button">Izbriši</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const newsTableBody = document.getElementById('news-table').getElementsByTagName('tbody')[0];
+            const newsForm = document.getElementById('news-form');
+            const filterLink = document.getElementById('filter-link');
+            let newsList = [];
+            let newsToDeleteIndex = null;
+            let ascending = true;
+
+            filterLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                ascending = !ascending;
+                filterLink.textContent = `Filter: ${ascending ? 'Ascending' : 'Descending'}`;
+                renderNews(newsList);
+            });
+
+            function renderNews(newsList) {
+                newsTableBody.innerHTML = '';
+                const sortedList = [...newsList].sort((a, b) => {
+                    const dateA = new Date(a.date);
+                    const dateB = new Date(b.date);
+                    return ascending ? dateA - dateB : dateB - dateA;
+                });
+                sortedList.forEach((news, index) => {
+                    const row = newsTableBody.insertRow();
+                    row.innerHTML = `
+                <td>${news.title}</td>
+                <td>${formatDate(news.date)}</td>
+                <td>${news.content}</td>
+                <td><img src="${news.image}" alt="${news.title}" style="width: 50px; height: 50px;"></td>
+                <td>
+                    <button class="button" onclick="editNews('${news._id}')">Uredi</button>
+                    <button class="button" onclick="confirmDeleteNews('${news._id}')">Izbriši</button>
+                </td>
+            `;
+                });
+            }
+
+            function formatDate(dateString) {
+                if (!dateString || isNaN(new Date(dateString))) {
+                    const today = new Date();
+                    const day = String(today.getDate()).padStart(2, '0');
+                    const month = String(today.getMonth() + 1).padStart(2, '0');
+                    const year = String(today.getFullYear()).slice(-2);
+                    return `${day}/${month}/${year}`;
+                }
+                const date = new Date(dateString);
+                const day = String(date.getDate()).padStart(2, '0');
+                const month = String(date.getMonth() + 1).padStart(2, '0');
+                const year = String(date.getFullYear()).slice(-2);
+                return `${day}/${month}/${year}`;
+            }
+
+            async function fetchNews() {
+                try {
+                    const response = await fetch('http://localhost:3000/news/allnews');
+                    newsList = await response.json();
+                    renderNews(newsList);
+                } catch (error) {
+                    console.error('Error fetching news:', error);
+                }
+            }
+
+            async function postNewNews(news) {
+                try {
+                    const response = await fetch('http://localhost:3000/news', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(news)
+                    });
+                    if (response.ok) {
+                        fetchNews();
+                    } else {
+                        console.error('Failed to post new news');
+                    }
+                } catch (error) {
+                    console.error('Error posting new news:', error);
+                }
+            }
+
+            function saveNews() {
+                const newsId = document.getElementById('news-id').value;
+                const newsTitle = document.getElementById('news-title').value;
+                const newsContent = document.getElementById('news-content').value;
+                const newsImage = document.getElementById('news-image').value;
+
+                if (newsId) {
+                    const index = newsList.findIndex(news => news._id === newsId);
+                    if (index !== -1) {
+                        const news = {
+                            ...newsList[index],
+                            title: newsTitle,
+                            content: newsContent,
+                            image: newsImage,
+                        };
+                        postEditedNews(index, news);
+                    } else {
+                        console.error('News not found with ID:', newsId);
+                    }
+                } else {
+                    let news = {
+                        title: newsTitle,
+                        content: newsContent,
+                        image: newsImage,
+                        date: new Date().toISOString()
+                    };
+                    newsList.push(news);
+                    postNewNews(news);
+                }
+
+                renderNews(newsList);
+                newsForm.reset();
+                document.getElementById('news-id').value = '';
+            }
+
+            window.editNews = function (newsId) {
+                const news = newsList.find(news => news._id === newsId);
+                if (news) {
+                    document.getElementById('news-id').value = news._id;
+                    document.getElementById('news-title').value = news.title || '';
+                    document.getElementById('news-content').value = news.content || '';
+                    document.getElementById('news-image').value = news.image || '';
+                } else {
+                    console.error('News not found with ID:', newsId);
+                }
+            }
+
+            async function postEditedNews(index, news) {
+                if (!news._id) {
+                    console.error('News ID is undefined.');
+                    return;
+                }
+
+                try {
+                    const response = await fetch(`http://localhost:3000/news/${news._id}`, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(news)
+                    });
+                    if (response.ok) {
+                        fetchNews();
+                    } else {
+                        console.error('Failed to post edited news');
+                    }
+                } catch (error) {
+                    console.error('Error posting edited news:', error);
+                }
+            }
+
+            window.confirmDeleteNews = function (newsId) {
+                const index = newsList.findIndex(news => news._id === newsId);
+                if (index !== -1) {
+                    newsToDeleteIndex = index;
+                    document.getElementById('delete-modal').style.display = 'block';
+                } else {
+                    console.error('News not found with ID:', newsId);
+                }
+            }
+
+
+            window.closeModal = function () {
+                document.getElementById('delete-modal').style.display = 'none';
+                newsToDeleteIndex = null;
+            }
+
+            async function deleteNews(index) {
+                const news = newsList[index];
+                try {
+                    const response = await fetch(`http://localhost:3000/news/${news._id}`, {
+                        method: 'DELETE'
+                    });
+                    if (response.ok) {
+                        newsList.splice(index, 1);
+                        renderNews(newsList);
+                        newsForm.reset();
+                        document.getElementById('news-id').value = '';
+                    } else {
+                        console.error('Failed to delete news');
+                    }
+                } catch (error) {
+                    console.error('Error deleting news:', error);
+                }
+                closeModal();
+            }
+
+            document.getElementById('confirm-delete-button').addEventListener('click', () => {
+                if (newsToDeleteIndex !== null) {
+                    deleteNews(newsToDeleteIndex);
+                }
+            });
+
+            if (newsForm) {
+                newsForm.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    saveNews();
+                });
+            }
+
+            fetchNews();
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+    <title>Videi joge</title>
+    <link rel="stylesheet" href="stil.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/annyang/2.6.1/annyang.min.js"></script>
+</head>
+
+<body>
+    <header>
+        <nav>
+            <ul>
+                <li><a href="home.html">Domov</a></li>
+                <li><a href="index.html">Dodaj uporabnika</a></li>
+                <li><a href="jogaslike.html ">Vaje preko kamere</a></li>
+                <li><a href="videi.html">Prikaz videov</a></li>
+                <li><a href="news.html">Novice</a></li>
+                <li><a href="events.html">Dogodki</a></li>
+                <li><a href="http://localhost:3000/logout">Odjava</a></li>
+            </ul>
+            <button onclick="startVoiceCommands()">Začni Glasovne Ukaze</button>
+        </nav>
+    </header>
+    <section>
+        <h1>Seznam videov joge</h1>
+        <div class="video-gallery">
+            <!-- Vsak iframe ustreza enemu YouTube videu. Zamenjajte 'video_id' z dejanskimi YouTube ID-ji. -->
+            <iframe id="ena" width="320" height="240" src="https://www.youtube.com/embed/CY6QP4ofwx4?enablejsapi=1"
+                frameborder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowfullscreen></iframe>
+            <iframe id="dva" width="320" height="240" src="https://www.youtube.com/embed/Eml2xnoLpYE?enablejsapi=1"
+                frameborder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowfullscreen></iframe>
+            <iframe id="tri" width="320" height="240" src="https://www.youtube.com/embed/sTANio_2E0Q?enablejsapi=1"
+                frameborder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowfullscreen></iframe>
+            <iframe id="štiri" width="320" height="240" src="https://www.youtube.com/embed/WnSr8w4QEWo?enablejsapi=1"
+                frameborder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowfullscreen></iframe>
+            <iframe id="pet" width="320" height="240" src="https://www.youtube.com/embed/utrAlZf_Pjs?enablejsapi=1"
+                frameborder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowfullscreen></iframe>
+            <iframe id="šest" width="320" height="240" src="https://www.youtube.com/embed/DYGfwPppgO4?enablejsapi=1"
+                frameborder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowfullscreen></iframe>
+            <iframe id="sedem" width="320" height="240" src="https://www.youtube.com/embed/GLy2rYHwUqY?enablejsapi=1"
+                frameborder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowfullscreen></iframe>
+            <iframe id="osem" width="320" height="240" src="https://www.youtube.com/embed/8XNpAg5mDS8?enablejsapi=1"
+                frameborder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowfullscreen></iframe>
+        </div>
+    </section>
+
+    <footer>
+        <img data-src="/slike/icons/yoga-fotor-72x72.png" alt="Joga icon" class="lazy-image">
+        <p>&copy; 2024 YogaFlex. Vse pravice pridržane.</p>
+    </footer>
+    <script src="https://www.youtube.com/iframe_api"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/annyang/2.6.1/annyang.min.js"></script>
+    <script>
+        var players = {}; // Za shranjevanje YT predvajalnikov
+
+        function onYouTubeIframeAPIReady() {
+            var videoIds = ['ena', 'dva', 'tri', 'štiri', 'pet', 'šest', 'sedem', 'osem']; // Seznam ID-jev videov
+            videoIds.forEach(function (id) {
+                players[id] = new YT.Player(id, {
+                    events: {
+                        'onReady': onPlayerReady,
+                    }
+                });
+            });
+        }
+
+        function onPlayerReady(event) {
+            //glasovne komande
+            var commands = {
+                'domov': function () {
+                    speak('Preusmerjam domov');
+                    setTimeout(function () {
+                        window.location.href = '/test';
+                    }, 1500);
+                },
+                'ena': function () {
+                    speak('Predvajam video');
+                    var video = document.getElementById('ena');
+                    if (video) {
+                        video.play();
+                    } else {
+                        speak('Video ni najden');
+                    }
+                },
+                'dva': function () {
+                    speak('Predvajam video');
+                    var video = document.getElementById('dva');
+                    if (video) {
+                        video.play();
+                    } else {
+                        speak('Video ni najden');
+                    }
+                },
+                'tri': function () {
+                    speak('Predvajam video');
+                    var video = document.getElementById('tri');
+                    if (video) {
+                        video.play();
+                    } else {
+                        speak('Video ni najden');
+                    }
+                },
+                'štiri': function () {
+                    speak('Predvajam video');
+                    var video = document.getElementById('štiri');
+                    if (video) {
+                        video.play();
+                    } else {
+                        speak('Video ni najden');
+                    }
+                },
+                'pet': function () {
+                    speak('Predvajam video');
+                    var video = document.getElementById('pet');
+                    if (video) {
+                        video.play();
+                    } else {
+                        speak('Video ni najden');
+                    }
+                },
+                'šest': function () {
+                    speak('Predvajam video');
+                    var video = document.getElementById('šest');
+                    if (video) {
+                        video.play();
+                    } else {
+                        speak('Video ni najden');
+                    }
+                },
+                'sedem': function () {
+                    speak('Predvajam video');
+                    var video = document.getElementById('sedem');
+                    if (video) {
+                        video.play();
+                    } else {
+                        speak('Video ni najden');
+                    }
+                },
+                'osem': function () {
+                    speak('Predvajam video');
+                    var video = document.getElementById('osem');
+                    if (video) {
+                        video.play();
+                    } else {
+                        speak('Video ni najden');
+                    }
+                },
+            };
+            annyang.addCommands(commands);
+            annyang.setLanguage('sl');
+            // annyang.start({ autoRestart: true, continuous: false });
+        }
+
+        function startVoiceCommands() {
+            if (annyang) {
+                annyang.resume();
+                speak('Glasovni ukazi so aktivirani.');
+            } else {
+                alert('Glasovni ukazi niso podprti ali omogočeni v vašem brskalniku.');
+            }
+        }
+
+        function speak(text) {
+            var speech = new SpeechSynthesisUtterance(text);
+            speech.lang = 'sl-SI';
+            window.speechSynthesis.speak(speech);
+        }
+    </script>
+
+</body>
+
+</html>
